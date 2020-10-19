@@ -28,3 +28,14 @@
     - combo.lod
     - option.lod
     - quest.lod
+    - smc.lod
+    - item_exchange.lod
+    - itemFortune.lod
+    - moonstone.lod
+    - notice.lod
+    - raidobjectlist.lod
+  - bin/data
+    - itemCompose.bin
+    - levelup_guide.bin
+    - npc_channel.bin
+    - statTooltip.bin

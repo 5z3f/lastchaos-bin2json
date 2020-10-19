@@ -10,6 +10,9 @@ class BinaryReader:
         i = unpack('@I', self.f.read(4))[0]
         return -1 if i == 4294967295 else i
 
+    def ReadInt16(self):
+        return unpack('@h', self.f.read(2))[0]
+
     def ReadInt64(self):
         return unpack('@q', self.f.read(8))[0]
 
@@ -28,7 +31,10 @@ class BinaryReader:
     def ReadByte(self):
         return self.f.read(1)
 
-    def ReadBytes(self, count, encoding):
+    def ReadBytes(self, i):
+        return self.f.read(i)
+
+    def ReadBytesToString(self, count, encoding):
         return self.f.read(count).decode(encoding).rstrip('\x00')
 
     def ByteToInt(self, bytes):

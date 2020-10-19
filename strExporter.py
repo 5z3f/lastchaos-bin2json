@@ -28,10 +28,10 @@ def readStr(file, fileType, encoding):
 
         if 'strskill_us.lod' in fileTypeLower:            doubleDesc = True
         elif 'strquest_us.lod' in fileTypeLower:          tripleDesc = True
-        elif fileTypeLower in emptyDescFiles:    emptyDesc = True
+        elif fileTypeLower in emptyDescFiles:             emptyDesc = True
 
         
-        for i in range(0, dataCount):
+        for i in range(dataCount):
             id = br.ReadInt()
             name = br.ReadString(encoding)
 
@@ -52,7 +52,7 @@ def readStr(file, fileType, encoding):
 
 def main():
     fileType = input('string file [ex. strItem_us.lod]: ')
-    folder = "D:\\Games\\LastChaosTestClient\\Local\\us\\String"
+    folder = "C:\\Program Files (x86)\\gamigo AG\\LastChaosUK_VIP\\Local\\uk\\String"
     file = "{0}\\{1}".format(folder, fileType)
 
     data = readStr(file, fileType, 'latin1')
