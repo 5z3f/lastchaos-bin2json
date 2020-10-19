@@ -1,53 +1,19 @@
 __author__          = 'agsvn'
 
 from struct import unpack
-import array
+from lib.reader import BinaryReader
+
 import calendar
 import time
 import json
-
-class BinaryReader:
-    def __init__(self, file):
-        self.f = file
-
-    def ReadInt(self):
-        i = unpack('@I', self.f.read(4))[0]
-        return -1 if i == 4294967295 else i
-
-    def ReadInt64(self):
-        return unpack('@q', self.f.read(8))[0]
-
-    def ReadIntToList(self, i):
-        return [-1 if i == 4294967295 else i for i in list(unpack("@%dI" % i, self.f.read(4*i)))]
-
-    def ReadInt64ToList(self, i):
-        return list(unpack("@%dq" % i, self.f.read(8*i)))
-
-    def ReadFloat(self):
-        return unpack('@f', self.f.read(4))[0]
-
-    def ReadString(self):
-        return self.f.read(unpack('@I', self.f.read(4))[0])
-
-    def ReadByte(self):
-        return self.f.read(1)
-
-    def ReadBytes(self, count, encoding):
-        return self.f.read(count).decode(encoding).rstrip('\x00')
-
-    def ByteToInt(self, bytes):
-        result = 0
-        for b in bytes:
-            result = result * 256 + int(b)
-        return result
 
 def readAction(file):
     data = []
     with open(file, "rb") as f:
         br = BinaryReader(f)
-        intDataCount = br.ReadInt()
+        dataCount = br.ReadInt()
 
-        for i in range(0, intDataCount):
+        for i in range(0, dataCount):
             chunk = {
                 "id": br.ReadInt(),
                 "type": br.ByteToInt(br.ReadByte()),
@@ -63,21 +29,21 @@ def readAffinity(file):
     data = []
     with open(file, "rb") as f:
         br = BinaryReader(f)
-        intDataCount = br.ReadInt()
+        dataCount = br.ReadInt()
 
-        for i in range(0, intDataCount):
-            intId = br.ReadInt()
-            intIconPosition = br.ReadIntToList(3)
-            intNeedItemId = br.ReadInt()
-            intNeedItemCount = br.ReadInt()
-            intNeedLevel = br.ReadInt()
-            intNeedId = br.ReadInt()
-            intNeedPoints = br.ReadInt()
+        for i in range(0, dataCount):
+            id = br.ReadInt()
+            iconPosition = br.ReadIntToList(3)
+            needItemId = br.ReadInt()
+            needItemCount = br.ReadInt()
+            needLevel = br.ReadInt()
+            needId = br.ReadInt()
+            needPoints = br.ReadInt()
 
             affinityNpcsData = []
-            intNpcsRows = br.ReadInt()
+            npcsRows = br.ReadInt()
 
-            for j in range(0, intNpcsRows):
+            for j in range(0, npcsRows):
                 affinityNpc = {
                     "npcId": br.ReadInt(),
                     "npcFlag": br.ReadInt(),
@@ -87,9 +53,9 @@ def readAffinity(file):
                 affinityNpcsData.append(affinityNpc)
 
             affinityContributeItemData = []
-            intContributeItemRows = br.ReadInt()
+            contributeItemRows = br.ReadInt()
 
-            for k in range(0, intContributeItemRows):
+            for k in range(0, contributeItemRows):
                 affinityContributeItem = {
                     "itemId": br.ReadInt(),
                     "points": br.ReadInt()
@@ -98,9 +64,9 @@ def readAffinity(file):
                 affinityContributeItemData.append(affinityContributeItem)
 
             affinityContributeMonsterData = []
-            intContributeMonsterRows = br.ReadInt()
+            contributeMonsterRows = br.ReadInt()
 
-            for l in range(0, intContributeMonsterRows):
+            for l in range(0, contributeMonsterRows):
                 affinityContributeMonster = {
                     "npcId": br.ReadInt(),
                     "points": br.ReadInt(),
@@ -110,9 +76,9 @@ def readAffinity(file):
                 affinityContributeMonsterData.append(affinityContributeMonster)
 
             affinityContributeQuestData = []
-            intContributeQuestRows = br.ReadInt()
+            contributeQuestRows = br.ReadInt()
 
-            for m in range(0, intContributeQuestRows):
+            for m in range(0, contributeQuestRows):
                 affinityContributeQuest = {
                     "questId": br.ReadInt(),
                     "points": br.ReadInt()
@@ -121,9 +87,9 @@ def readAffinity(file):
                 affinityContributeQuestData.append(affinityContributeQuest)
 
             affinityRewardItemData = []
-            intRewardItemRows = br.ReadInt()
+            rewardItemRows = br.ReadInt()
 
-            for n in range(0, intRewardItemRows):
+            for n in range(0, rewardItemRows):
                 affinityRewardItem = {
                     "itemId": br.ReadInt(),
                     "points": br.ReadInt()
@@ -132,16 +98,16 @@ def readAffinity(file):
                 affinityRewardItemData.append(affinityRewardItem)
 
             chunk = {
-                "id": intId,
-                "iconPosition": intIconPosition,
+                "id": id,
+                "iconPosition": iconPosition,
                 "itemRequirements": {
-                    "itemId": intNeedItemId,
-                    "itemCount": intNeedItemCount,
+                    "itemId": needItemId,
+                    "itemCount": needItemCount,
                 },
-                "requiredLevel": intNeedLevel,
+                "requiredLevel": needLevel,
                 "requirements": {
-                    "affinityId": intNeedId,
-                    "affinityPoints": intNeedPoints,
+                    "affinityId": needId,
+                    "affinityPoints": needPoints,
                 },
                 "npcs": affinityNpcsData,
                 "contributeItems": affinityContributeItemData,
@@ -163,27 +129,27 @@ def readBigpet(file):
     data = []
     with open(file, "rb") as f:
         br = BinaryReader(f)
-        intDataCount = br.ReadInt()
+        dataCount = br.ReadInt()
 
-        for i in range(0, intDataCount):
-            intId = br.ReadInt()
-            strName = br.ReadBytes(DEF_APET_NAME_LENGTH, 'latin-1')
-            intType = br.ReadInt()
-            intItemId = br.ReadInt()
-            intAISlot = br.ReadInt()
-            intMount = br.ReadIntToList(2)
-            intSummonSkill = br.ReadIntToList(2)
-            intFlag = br.ReadInt()
-            strSMC = [br.ReadBytes(DEF_SMCFILE_LENGTH, 'latin-1'), br.ReadBytes(DEF_SMCFILE_LENGTH, 'latin-1')]
-            strIdle1 = [br.ReadBytes(DEF_APET_ANI_LENGTH, 'latin-1'), br.ReadBytes(DEF_APET_ANI_LENGTH, 'latin-1')]
-            strIdle2 = [br.ReadBytes(DEF_APET_ANI_LENGTH, 'latin-1'), br.ReadBytes(DEF_APET_ANI_LENGTH, 'latin-1')]
-            strAttack1 = [br.ReadBytes(DEF_APET_ANI_LENGTH, 'latin-1'), br.ReadBytes(DEF_APET_ANI_LENGTH, 'latin-1')]
-            strAttack2 = [br.ReadBytes(DEF_APET_ANI_LENGTH, 'latin-1'), br.ReadBytes(DEF_APET_ANI_LENGTH, 'latin-1')]
-            strDamage = [br.ReadBytes(DEF_APET_ANI_LENGTH, 'latin-1'), br.ReadBytes(DEF_APET_ANI_LENGTH, 'latin-1')]
-            strDie = [br.ReadBytes(DEF_APET_ANI_LENGTH, 'latin-1'), br.ReadBytes(DEF_APET_ANI_LENGTH, 'latin-1')]
-            strWalk = [br.ReadBytes(DEF_APET_ANI_LENGTH, 'latin-1'), br.ReadBytes(DEF_APET_ANI_LENGTH, 'latin-1')]
-            strRun = [br.ReadBytes(DEF_APET_ANI_LENGTH, 'latin-1'), br.ReadBytes(DEF_APET_ANI_LENGTH, 'latin-1')]
-            strLevelup = [br.ReadBytes(DEF_APET_ANI_LENGTH, 'latin-1'), br.ReadBytes(DEF_APET_ANI_LENGTH, 'latin-1')]
+        for i in range(0, dataCount):
+            id = br.ReadInt()
+            name = br.ReadBytes(DEF_APET_NAME_LENGTH, 'latin-1')
+            type = br.ReadInt()
+            itemId = br.ReadInt()
+            aiSlot = br.ReadInt()
+            mount = br.ReadIntToList(2)
+            summonSkill = br.ReadIntToList(2)
+            flag = br.ReadInt()
+            smc = [br.ReadBytes(DEF_SMCFILE_LENGTH, 'latin-1'), br.ReadBytes(DEF_SMCFILE_LENGTH, 'latin-1')]
+            idle1 = [br.ReadBytes(DEF_APET_ANI_LENGTH, 'latin-1'), br.ReadBytes(DEF_APET_ANI_LENGTH, 'latin-1')]
+            idle2 = [br.ReadBytes(DEF_APET_ANI_LENGTH, 'latin-1'), br.ReadBytes(DEF_APET_ANI_LENGTH, 'latin-1')]
+            attack1 = [br.ReadBytes(DEF_APET_ANI_LENGTH, 'latin-1'), br.ReadBytes(DEF_APET_ANI_LENGTH, 'latin-1')]
+            attack2 = [br.ReadBytes(DEF_APET_ANI_LENGTH, 'latin-1'), br.ReadBytes(DEF_APET_ANI_LENGTH, 'latin-1')]
+            damage = [br.ReadBytes(DEF_APET_ANI_LENGTH, 'latin-1'), br.ReadBytes(DEF_APET_ANI_LENGTH, 'latin-1')]
+            die = [br.ReadBytes(DEF_APET_ANI_LENGTH, 'latin-1'), br.ReadBytes(DEF_APET_ANI_LENGTH, 'latin-1')]
+            walk = [br.ReadBytes(DEF_APET_ANI_LENGTH, 'latin-1'), br.ReadBytes(DEF_APET_ANI_LENGTH, 'latin-1')]
+            run = [br.ReadBytes(DEF_APET_ANI_LENGTH, 'latin-1'), br.ReadBytes(DEF_APET_ANI_LENGTH, 'latin-1')]
+            levelup = [br.ReadBytes(DEF_APET_ANI_LENGTH, 'latin-1'), br.ReadBytes(DEF_APET_ANI_LENGTH, 'latin-1')]
 
             apetEvolutionData = []
 
@@ -198,26 +164,26 @@ def readBigpet(file):
                 apetEvolutionData.append(apetEvolution)
 
             chunk = {
-                "id": intId,
-                "name": strName,
-                "type": intType,
-                "itemId": intItemId,
-                "aiSlot": intAISlot,
-                "mount": intMount,
-                "summonSkill": intSummonSkill,
-                "flag": intFlag,
+                "id": id,
+                "name": name,
+                "type": type,
+                "itemId": itemId,
+                "aiSlot": aiSlot,
+                "mount": mount,
+                "summonSkill": summonSkill,
+                "flag": flag,
                 "model": {
-                    "smc": strSMC,
+                    "smc": smc,
                     "animation": {
-                        "idle1": strIdle1,
-                        "idle2": strIdle2,
-                        "attack1": strAttack1,
-                        "attack2": strAttack2,
-                        "damage": strDamage,
-                        "die": strDie,
-                        "walk": strWalk,
-                        "run": strRun,
-                        "levelup": strLevelup
+                        "idle1": idle1,
+                        "idle2": idle2,
+                        "attack1": attack1,
+                        "attack2": attack2,
+                        "damage": damage,
+                        "die": die,
+                        "walk": walk,
+                        "run": run,
+                        "levelup": levelup
                     }
                 },
                 "evolutionData": apetEvolutionData,
@@ -241,9 +207,9 @@ def readCombo(file):
     data = []
     with open(file, "rb") as f:
         br = BinaryReader(f)
-        intDataCount = br.ReadInt()
+        dataCount = br.ReadInt()
 
-        for i in range(0, intDataCount):
+        for i in range(0, dataCount):
             chunk = {
                 "id": br.ReadInt(),
                 "gold": br.ReadInt(),
@@ -262,9 +228,9 @@ def readOption(file):
     data = []
     with open(file, "rb") as f:
         br = BinaryReader(f)
-        intDataCount = br.ReadInt()
+        dataCount = br.ReadInt()
 
-        for i in range(0, intDataCount):
+        for i in range(0, dataCount):
             chunk = {
                 "id": br.ReadInt(),
                 "type": br.ReadInt(),
@@ -285,92 +251,92 @@ def readQuest(file):
     data = []
     with open(file, "rb") as f:
         br = BinaryReader(f)
-        intDataCount = br.ReadInt()
+        dataCount = br.ReadInt()
 
-        for i in range(0, intDataCount):
-            intId = br.ReadInt()
-            intType1 = br.ReadInt()
-            intType2 = br.ReadInt()
-            intStartType = br.ReadInt()
-            intStartData = br.ReadInt()
-            intPrizeNpc = br.ReadInt()
-            intPreQuestNo = br.ReadInt()
-            intStartNpcZoneNo = br.ReadInt()
-            intPrizeNpcZoneNo = br.ReadInt()
-            intNeedExp = br.ReadInt()
-            intNeedMinLevel = br.ReadInt()
-            intNeedMaxLevel = br.ReadInt()
-            intNeedJob = br.ReadInt()
-            intNeedMinPenalty = br.ReadInt()
-            intNeedMaxPenalty = br.ReadInt()
-            arrNeedItemIndex = br.ReadIntToList(QUEST_MAX_NEED_ITEM)
-            arrNeedItemCount = br.ReadIntToList(QUEST_MAX_NEED_ITEM)
-            intRVRType = br.ReadInt()
-            intRVRGrade = br.ReadInt()
+        for i in range(0, dataCount):
+            id = br.ReadInt()
+            type1 = br.ReadInt()
+            type2 = br.ReadInt()
+            startType = br.ReadInt()
+            startData = br.ReadInt()
+            prizeNpc = br.ReadInt()
+            preQuestNo = br.ReadInt()
+            startNpcZoneNo = br.ReadInt()
+            prizeNpcZoneNo = br.ReadInt()
+            needExp = br.ReadInt()
+            needMinLevel = br.ReadInt()
+            needMaxLevel = br.ReadInt()
+            needJob = br.ReadInt()
+            needMinPenalty = br.ReadInt()
+            needMaxPenalty = br.ReadInt()
+            needItemIndex = br.ReadIntToList(QUEST_MAX_NEED_ITEM)
+            needItemCount = br.ReadIntToList(QUEST_MAX_NEED_ITEM)
+            rvrType = br.ReadInt()
+            rvrGrade = br.ReadInt()
 
-            arrConditionType = br.ReadIntToList(QUEST_MAX_CONDITION)
-            arrConditionIndex = br.ReadIntToList(QUEST_MAX_CONDITION)
-            arrConditionNum = br.ReadIntToList(QUEST_MAX_CONDITION)
+            conditionType = br.ReadIntToList(QUEST_MAX_CONDITION)
+            conditionIndex = br.ReadIntToList(QUEST_MAX_CONDITION)
+            conditionNum = br.ReadIntToList(QUEST_MAX_CONDITION)
 
-            arrConditionData = []
+            conditionData = []
             for i in range(0, QUEST_MAX_CONDITION):
-                arrConditionData.append(br.ReadIntToList(QUEST_MAX_CONDITION_DATA))
+                conditionData.append(br.ReadIntToList(QUEST_MAX_CONDITION_DATA))
             
-            arrPrizeType = br.ReadIntToList(QUEST_MAX_PRIZE)
-            arrPrizeIndex = br.ReadIntToList(QUEST_MAX_PRIZE)
-            arrPrizeData = br.ReadInt64ToList(QUEST_MAX_PRIZE)
+            prizeType = br.ReadIntToList(QUEST_MAX_PRIZE)
+            prizeIndex = br.ReadIntToList(QUEST_MAX_PRIZE)
+            prizeData = br.ReadInt64ToList(QUEST_MAX_PRIZE)
             
-            intOptionPrize = br.ReadInt()
-            arrOptPrizeType = br.ReadIntToList(QUEST_MAX_OPTPRIZE)
-            arrOptPrizeIndex = br.ReadIntToList(QUEST_MAX_OPTPRIZE)
-            arrOptPrizeData = br.ReadIntToList(QUEST_MAX_OPTPRIZE)
-            arrOptPrizePlus = br.ReadIntToList(QUEST_MAX_OPTPRIZE)
+            optionPrize = br.ReadInt()
+            optPrizeType = br.ReadIntToList(QUEST_MAX_OPTPRIZE)
+            optPrizeIndex = br.ReadIntToList(QUEST_MAX_OPTPRIZE)
+            optPrizeData = br.ReadIntToList(QUEST_MAX_OPTPRIZE)
+            optPrizePlus = br.ReadIntToList(QUEST_MAX_OPTPRIZE)
 
-            intPartyscale = br.ReadInt()
-            intOnlyOptPrize = br.ReadInt()
+            partyScale = br.ReadInt()
+            onlyOptPrize = br.ReadInt()
 
             chunk = {
-                "id": intId,
+                "id": id,
                 "questType": {
-                    "type1": intType1,
-                    "type2": intType2
+                    "type1": type1,
+                    "type2": type2
                 },
-                "startType": intStartType,
-                "startNpc": intStartData,
-                "prizeNpc": intPrizeNpc,
-                "preQuestId": intPreQuestNo,
-                "startNpcZoneId": intStartNpcZoneNo,
-                "prizeNpcZoneId": intPrizeNpcZoneNo,
-                "needExp": intNeedExp,
-                "minLevel": intNeedMinLevel,
-                "maxLevel": intNeedMaxLevel,
-                "requiredJob": intNeedJob,
-                "pkPenaltyMin": intNeedMinPenalty,
-                "pkPenaltyMax": intNeedMaxPenalty,
+                "startType": startType,
+                "startNpc": startData,
+                "prizeNpc": prizeNpc,
+                "preQuestId": preQuestNo,
+                "startNpcZoneId": startNpcZoneNo,
+                "prizeNpcZoneId": prizeNpcZoneNo,
+                "needExp": needExp,
+                "minLevel": needMinLevel,
+                "maxLevel": needMaxLevel,
+                "requiredJob": needJob,
+                "pkPenaltyMin": needMinPenalty,
+                "pkPenaltyMax": needMaxPenalty,
                 "requiredItems": {
-                    "itemIds": arrNeedItemIndex,
-                    "itemCount": arrNeedItemCount
+                    "itemIds": needItemIndex,
+                    "itemCount": needItemCount
                 },
-                "rvrTypeId": intRVRType,
-                "rvrGradeId": intRVRGrade,
+                "rvrTypeId": rvrType,
+                "rvrGradeId": rvrGrade,
                 "condition": {
-                    "types": arrConditionType,
-                    "ids": arrConditionIndex,
-                    "count": arrConditionNum,
-                    "data": arrConditionData
+                    "types": conditionType,
+                    "ids": conditionIndex,
+                    "count": conditionNum,
+                    "data": conditionData
                 },
                 "prize": {
-                    "types": arrPrizeType,
-                    "ids": arrPrizeIndex,
-                    "data": arrPrizeData,
-                    "optionPrize": intOptionPrize,
-                    "optionPrizeType": arrOptPrizeType,
-                    "optionPrizeIndex": arrOptPrizeIndex,
-                    "optionPrizeData": arrOptPrizeData,
-                    "optionPrizePlus": arrOptPrizePlus
+                    "types": prizeType,
+                    "ids": prizeIndex,
+                    "data": prizeData,
+                    "optionPrize": optionPrize,
+                    "optionPrizeType": optPrizeType,
+                    "optionPrizeIndex": optPrizeIndex,
+                    "optionPrizeData": optPrizeData,
+                    "optionPrizePlus": optPrizePlus
                 },
-                "groupType": intPartyscale,
-                "onlyOptPrize": intOnlyOptPrize
+                "groupType": partyScale,
+                "onlyOptPrize": onlyOptPrize
             }
 
             data.append(chunk)
@@ -380,7 +346,7 @@ def readQuest(file):
 
 
 def main():
-    fileType = input('\t lod file type [itemAll.lod, actions.lod]: ')
+    fileType = input('lod file type [itemAll.lod, actions.lod]: ')
     folder = "C:\\Users\\Administrator\\Desktop\\export"
     file = "{0}\\{1}".format(folder, fileType)
 
@@ -400,8 +366,9 @@ def main():
     tpl = {
         "exportInfo": {
             "gameVersion": None,
-            "fileType": '{0}'.format(fileType),
-            "date": calendar.timegm(time.gmtime())
+            "file": fileType,
+            "fileType": "lod/data",
+            "timestamp": calendar.timegm(time.gmtime())
         },
         "data": data
     }
@@ -409,7 +376,7 @@ def main():
     with open('{0}.json'.format(fileType), 'w', encoding='utf8') as f:
        json.dump(tpl, f, indent=2, ensure_ascii=False)
 
-    print("[{0}] Exported to {0}.json".format(fileType))
+    print("Exported to {0}.json".format(fileType))
             
 if __name__ == '__main__':
     main()

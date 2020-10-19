@@ -1,77 +1,76 @@
 __author__          = 'agsvn'
 
 from struct import unpack
-import array
+from lib.reader import BinaryReader
+
 import calendar
 import time
 import json
 
-class BinaryReader:
-    def ReadInt(self, f):
-        return unpack('I', f.read(4))[0]
-
-    def ReadFloat(self, f):
-        return unpack('f', f.read(4))[0]
-
-    def ReadString(self, f):
-        return f.read(unpack('I', f.read(4))[0])
-
-    def ReadShort(self, f):
-        return unpack('h', f.read(2))[0]
-
-def readStr(file, fileType):
+def readStr(file, fileType, encoding):
     data = []
     with open(file, "rb") as f:
-        br = BinaryReader()
-        rows, max = br.ReadInt(f), br.ReadInt(f)
+        br = BinaryReader(f)
+        dataCount, dataMax = br.ReadInt(), br.ReadInt()
+        fileTypeLower = fileType.lower()
+
+        #singleDesc = False
+        doubleDesc, tripleDesc, emptyDesc = False, False, False
+
+        emptyDescFiles = [
+            'strclient_us.lod',
+            'straffinity_us.lod',
+            'strcombo_us.lod',
+            'strrareoption_us.lod',
+            'strsetitem_us.lod',
+            'stroption_us.lod'
+        ]
+
+        if 'strskill_us.lod' in fileTypeLower:            doubleDesc = True
+        elif 'strquest_us.lod' in fileTypeLower:          tripleDesc = True
+        elif fileTypeLower in emptyDescFiles:    emptyDesc = True
+
         
-        print("[item] reading {0} {1} string rows".format(rows, fileType))
-        for i in range(0, rows):
-            idx = br.ReadInt(f)
-            name = br.ReadString(f).decode('latin-1')
+        for i in range(0, dataCount):
+            id = br.ReadInt()
+            name = br.ReadString(encoding)
 
-            if fileType == 'skill':
-                desc = [br.ReadString(f).decode('latin-1'), br.ReadString(f).decode('latin-1')]
-            elif fileType == 'quest':
-                desc = [br.ReadString(f).decode('latin-1'), br.ReadString(f).decode('latin-1'), br.ReadString(f).decode('latin-1')]
-            elif fileType == 'client' or fileType == 'affinity' or fileType == 'combo' or fileType == 'rareoption' or fileType == 'setitem' or fileType == 'option':
-                desc = []
-            else:
-                desc = br.ReadString(f).decode('latin-1')
-
+            if doubleDesc:      desc = [br.ReadString(encoding), br.ReadString(encoding)]
+            elif tripleDesc:    desc = [br.ReadString(encoding), br.ReadString(encoding), br.ReadString(encoding)]
+            elif emptyDesc:     desc = []
+            else:               desc = [br.ReadString(encoding)]
 
             chunk = {   
-                "stringId": idx,
+                "stringId": id,
                 "stringName": name,
-                "stringDescription": desc if len(desc) else None
+                "stringDescription": None if emptyDesc else desc
             }
 
             data.append(chunk)
 
     return data
-    
-
 
 def main():
-    fileType = input('\t string file type [item, npcname, skill, quest]: ')
+    fileType = input('string file [ex. strItem_us.lod]: ')
     folder = "D:\\Games\\LastChaosTestClient\\Local\\us\\String"
-    file = "{0}\\str{1}_us.lod".format(folder, fileType)
+    file = "{0}\\{1}".format(folder, fileType)
 
-    data = readStr(file, fileType)
+    data = readStr(file, fileType, 'latin1')
             
     tpl = {
         "exportInfo": {
-            "gameVersion": 'branch-03.413.392',
-            "fileType": '{0}String'.format(fileType),
-            "date": calendar.timegm(time.gmtime())
+            "gameVersion": None,
+            "file": fileType,
+            "fileType": "lod/string",
+            "timestamp": calendar.timegm(time.gmtime())
         },
         "data": data
     }
 
-    with open('str{0}_us.json'.format(fileType.capitalize()), 'w', encoding='utf8') as f:
+    with open('exported/{0}.json'.format(fileType), 'w', encoding='utf8') as f:
         json.dump(tpl, f, indent=2, ensure_ascii=False)
 
-    print("[{0}] Exported to str{1}_us.json".format(fileType, fileType.capitalize()))
+    print("Exported to %s.json" % fileType)
             
 if __name__ == '__main__':
     main()
