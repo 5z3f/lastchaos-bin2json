@@ -1,6 +1,7 @@
 __author__          = 'agsvn'
 
 from struct import unpack
+from math import floor
 
 class BinaryReader:
     def __init__(self, file):
@@ -23,7 +24,10 @@ class BinaryReader:
         return list(unpack("@%dq" % i, self.f.read(8*i)))
 
     def ReadFloat(self):
-        return unpack('@f', self.f.read(4))[0]
+        return (floor(unpack('@f', self.f.read(4))[0]*pow(10, 3)+0.5))/pow(10, 3)
+
+    def ReadFloatToList(self, i):
+        return list(unpack('@%df' % i, self.f.read(4*i)))
 
     def ReadString(self, encoding):
         return self.f.read(unpack('@I', self.f.read(4))[0]).decode(encoding)

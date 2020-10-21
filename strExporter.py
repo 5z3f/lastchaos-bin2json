@@ -7,44 +7,48 @@ import calendar
 import time
 import json
 
-def readStr(file, fileType, encoding):
+def readStr(file, fileType, encoding, isGamigo):
     data = []
     with open(file, "rb") as f:
         br = BinaryReader(f)
         dataCount, dataMax = br.ReadInt(), br.ReadInt()
         fileTypeLower = fileType.lower()
 
-        #singleDesc = False
-        doubleDesc, tripleDesc, emptyDesc = False, False, False
+        descCount = 1
 
         emptyDescFiles = [
-            'strclient_us.lod',
-            'straffinity_us.lod',
-            'strcombo_us.lod',
-            'strrareoption_us.lod',
-            'strsetitem_us.lod',
-            'stroption_us.lod'
+            'strclient',
+            'straffinity',
+            'strcombo',
+            'strrareoption',
+            'strsetitem',
+            'stroption'
         ]
 
-        if 'strskill_us.lod' in fileTypeLower:            doubleDesc = True
-        elif 'strquest_us.lod' in fileTypeLower:          tripleDesc = True
-        elif fileTypeLower in emptyDescFiles:             emptyDesc = True
+        if 'strskill' in fileTypeLower:            descCount = 2
+        elif 'strquest' in fileTypeLower:          descCount = 3
+        elif fileTypeLower[:-7] in emptyDescFiles: descCount = 0
 
         
         for i in range(dataCount):
             id = br.ReadInt()
             name = br.ReadString(encoding)
 
-            if doubleDesc:      desc = [br.ReadString(encoding), br.ReadString(encoding)]
-            elif tripleDesc:    desc = [br.ReadString(encoding), br.ReadString(encoding), br.ReadString(encoding)]
-            elif emptyDesc:     desc = []
-            else:               desc = [br.ReadString(encoding)]
+            desc = []
+            for j in range(descCount):
+                desc.append(br.ReadString(encoding))
 
+            if 'stritem' in fileTypeLower and isGamigo:
+                unknown0 = br.ReadInt()
+                unknown1 = br.ReadBytesToString(unknown0, 'latin1') if unknown0 else None
+            
             chunk = {   
-                "stringId": id,
-                "stringName": name,
-                "stringDescription": None if emptyDesc else desc
+                "id": id,
+                "name": name
             }
+
+            if descCount:
+                chunk["description"] = desc
 
             data.append(chunk)
 
@@ -55,7 +59,9 @@ def main():
     folder = "C:\\Program Files (x86)\\gamigo AG\\LastChaosUK_VIP\\Local\\uk\\String"
     file = "{0}\\{1}".format(folder, fileType)
 
-    data = readStr(file, fileType, 'latin1')
+    isGamigo = True
+
+    data = readStr(file, fileType, 'latin1', isGamigo)
             
     tpl = {
         "exportInfo": {

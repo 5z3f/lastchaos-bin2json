@@ -6,6 +6,7 @@ from lib.reader import BinaryReader
 import calendar
 import time
 import json
+import bson
 
 def readAction(file):
     data = []
@@ -14,14 +15,12 @@ def readAction(file):
         dataCount = br.ReadInt()
 
         for i in range(dataCount):
-            chunk = {
+            data.append({
                 "id": br.ReadInt(),
                 "type": br.ByteToInt(br.ReadByte()),
                 "job": br.ReadInt(),
                 "iconPosition": br.ReadIntToList(3)
-            }
-
-            data.append(chunk)
+            })
 
     return data
 
@@ -44,60 +43,50 @@ def readAffinity(file):
             npcsRows = br.ReadInt()
 
             for j in range(npcsRows):
-                affinityNpc = {
+                affinityNpcsData.append({
                     "npcId": br.ReadInt(),
                     "npcFlag": br.ReadInt(),
                     "npcStringId": br.ReadInt()
-                }
-
-                affinityNpcsData.append(affinityNpc)
+                })
 
             affinityContributeItemData = []
             contributeItemRows = br.ReadInt()
 
-            for k in range(contributeItemRows):
-                affinityContributeItem = {
+            for k in range(contributeItemRows):                
+                affinityContributeItemData.append({
                     "itemId": br.ReadInt(),
                     "points": br.ReadInt()
-                }
-                
-                affinityContributeItemData.append(affinityContributeItem)
+                })
 
             affinityContributeMonsterData = []
             contributeMonsterRows = br.ReadInt()
 
-            for l in range(contributeMonsterRows):
-                affinityContributeMonster = {
+            for l in range(contributeMonsterRows):                
+                affinityContributeMonsterData.append({
                     "npcId": br.ReadInt(),
                     "points": br.ReadInt(),
                     "iconPosition": br.ReadIntToList(3)
-                }
-                
-                affinityContributeMonsterData.append(affinityContributeMonster)
+                })
 
             affinityContributeQuestData = []
             contributeQuestRows = br.ReadInt()
 
-            for m in range(contributeQuestRows):
-                affinityContributeQuest = {
+            for m in range(contributeQuestRows):                
+                affinityContributeQuestData.append({
                     "questId": br.ReadInt(),
                     "points": br.ReadInt()
-                }
-                
-                affinityContributeQuestData.append(affinityContributeQuest)
+                })
 
             affinityRewardItemData = []
             rewardItemRows = br.ReadInt()
 
-            for n in range(rewardItemRows):
-                affinityRewardItem = {
+            for n in range(rewardItemRows):                
+                affinityRewardItemData.append({
                     "itemId": br.ReadInt(),
                     "points": br.ReadInt()
-                }
-                
-                affinityRewardItemData.append(affinityRewardItem)
+                })
 
-            chunk = {
+            data.append({
                 "id": id,
                 "iconPosition": iconPosition,
                 "itemRequirements": {
@@ -114,9 +103,7 @@ def readAffinity(file):
                 "contributeMonsters": affinityContributeMonsterData,
                 "contributeQuests": affinityContributeQuestData,
                 "rewardItems": affinityRewardItemData
-            }
-
-            data.append(chunk)
+            })
 
     return data
 
@@ -152,18 +139,15 @@ def readBigpet(file):
             levelup = [br.ReadBytesToString(DEF_APET_ANI_LENGTH, 'latin-1'), br.ReadBytesToString(DEF_APET_ANI_LENGTH, 'latin-1')]
 
             apetEvolutionData = []
-
-            for j in range(DEF_MAX_EVOLUTION):
-                apetEvolution = {
+            for j in range(DEF_MAX_EVOLUTION):                
+                apetEvolutionData.append({
                     "level": br.ReadInt(),
                     "stamina": br.ReadInt(),
                     "faith": br.ReadInt(),
                     "evPetId": br.ReadInt()
-                }
-                
-                apetEvolutionData.append(apetEvolution)
+                })
 
-            chunk = {
+            data.append({
                 "id": id,
                 "name": name,
                 "type": type,
@@ -194,12 +178,7 @@ def readBigpet(file):
                     "accRateParam1": br.ReadInt(),
                     "accRateParam2": br.ReadInt()
                 }
-            }
-
-            #br.ReadInt()
-            
-            #print(chunk)
-            data.append(chunk)
+            })
 
     return data
 
@@ -210,15 +189,13 @@ def readCombo(file):
         dataCount = br.ReadInt()
 
         for i in range(dataCount):
-            chunk = {
+            data.append({
                 "id": br.ReadInt(),
                 "gold": br.ReadInt(),
                 "iconPosition": br.ReadIntToList(3),
                 "skill": br.ByteToInt(br.ReadByte()),
                 "point": br.ReadInt()
-            }
-
-            data.append(chunk)
+            })
 
     return data
 
@@ -231,13 +208,11 @@ def readOption(file):
         dataCount = br.ReadInt()
 
         for i in range(dataCount):
-            chunk = {
+            data.append({
                 "id": br.ReadInt(),
                 "type": br.ReadInt(),
                 "levels": br.ReadIntToList(DEF_OPTION_MAX_LEVEL)
-            }
-
-            data.append(chunk)
+            })
 
     return data            
 
@@ -295,7 +270,7 @@ def readQuest(file):
             partyScale = br.ReadInt()
             onlyOptPrize = br.ReadInt()
 
-            chunk = {
+            data.append({
                 "id": id,
                 "questType": {
                     "type1": type1,
@@ -337,9 +312,7 @@ def readQuest(file):
                 },
                 "groupType": partyScale,
                 "onlyOptPrize": onlyOptPrize
-            }
-
-            data.append(chunk)
+            })
 
     return data            
 
@@ -377,16 +350,14 @@ def readSMC(file):
                             "texPath": texturePath,
                         })
 
-                chunk = {
+                data.append({
                     "id": id - 1,
                     "model": {
                         "modelName": meshClass,
                         "mesh": meshData,
                         "texture": texData
                     }
-                }
-
-                data.append(chunk)
+                })
 
     return data
 
@@ -450,13 +421,11 @@ def readMoonstone(file):
 
         for i in range(MOONSTONE_MAX_GAMIGO):
             itemCount = br.ReadInt()
-            
-            chunk = {
+
+            data.append({
                 "id": i,
                 "items": br.ReadIntToList(itemCount)
-            }
-
-            data.append(chunk)
+            })
             
     return data
 
@@ -476,7 +445,7 @@ def readNotice(file):
             cycle = br.ReadInt()
             color = [br.ByteToInt(br.ReadByte()), br.ByteToInt(br.ReadByte()), br.ByteToInt(br.ReadByte()), br.ByteToInt(br.ReadByte())]
 
-            chunk = {
+            data.append({
                 "id": id,
                 "enabled": enabled,
                 "title": title,
@@ -487,9 +456,7 @@ def readNotice(file):
                 },
                 "cycle": cycle,
                 "color": color
-            }
-
-            data.append(chunk)
+            })
             
     return data
 
@@ -515,7 +482,7 @@ def readRaidObjectList(file):
             objectIndex = br.ReadInt()
             objectName = br.ReadString('latin1')
 
-            chunk = {
+            data.append({
                 "id": id,
                 "assignZone": assignZone,
                 "object": {
@@ -523,17 +490,353 @@ def readRaidObjectList(file):
                     "type": objectType,
                     "name": objectName,
                 }
+            })
+            
+    return data
+
+def readJewelCompos(file):
+    data = []
+    with open(file, "rb") as f:
+        br = BinaryReader(f)
+        dataCount = br.ReadInt()
+
+        for i in range(dataCount):
+            level = br.ReadInt()
+            norCompNas = br.ReadInt()
+            caCompNas = br.ReadInt()
+            caJewCreate = br.ReadInt()
+            norCompVal = br.ReadInt()
+            caCompVal = br.ReadInt()
+            norUp2 = br.ReadInt()
+            norUp3 = br.ReadInt()
+            caUp2 = br.ReadInt()
+            caUp3 = br.ReadInt()
+            norDown1 = br.ReadInt()
+            norDown2 = br.ReadInt()
+            norDown3 = br.ReadInt()
+            caDown1 = br.ReadInt()
+            caDown2 = br.ReadInt()
+            caDown3 = br.ReadInt()
+
+            chunk = {
+                "level": level,
+                "gold": {
+                    "normalGoldNeed": norCompNas,
+                    "chaosGoldNeed": caCompNas
+                },
+                "normalToChaosComposeProb": caJewCreate,
+                "normalComposeProb": norCompVal,
+                "chaosComposeProb": caCompVal,
+                "normal": {
+                    "normalPlus2Prob": norUp2,
+                    "normalPlus3Prob": norUp3,
+                    "normalMinus1Prob": norDown1,
+                    "normalMinus2Prob": norDown2,
+                    "normalMinus3Prob": norDown3
+                },
+                "chaos": {
+                    "chaosPlus2Prob": caUp2,
+                    "chaosPlus3Prob": caUp3,
+                    "chaosMinus1Prob": caDown1,
+                    "chaosMinus2Prob": caDown2,
+                    "chaosMinus3Prob": caDown3
+                }
             }
 
             data.append(chunk)
             
     return data
 
+def readZoneFlag(file):
+    data = []
+    with open(file, "rb") as f:
+        br = BinaryReader(f)
+        dataCount = br.ReadInt()
+
+        for i in range(dataCount):
+            data.append({
+                "npcId": br.ReadInt(),
+                "zoneFlag": br.ReadInt64(),
+                "extraFlag": br.ReadInt64()
+            })
+
+    return data
+
+def readShop(file):
+    data = []
+    with open(file, "rb") as f:
+        br = BinaryReader(f)
+        dataCount = br.ReadInt()
+
+        for i in range(dataCount):
+            id = br.ReadInt()
+            shopName = br.ReadBytesToString(br.ReadInt(), 'latin1')
+            sellRate = br.ReadInt()
+            buyRate = br.ReadInt()
+            itemCount = br.ReadInt()
+            sellItems = br.ReadIntToList(itemCount)
+
+            data.append({
+               "npcId": id,
+               "shopName": shopName,
+               "rate": {
+                   "sell": sellRate,
+                   "buy": buyRate
+               },
+               "itemCount": itemCount,
+               "items": sellItems
+            })
+
+            if dataCount == id:
+                break;
+                
+    return data
+
+def readZoneData(file):
+    DEF_EXTRA_MAX = 30
+
+    data = []
+    with open(file, "rb") as f:
+        br = BinaryReader(f)
+        zoneCount = br.ReadInt()
+
+        zoneInfoChunk = []
+        for i in range(zoneCount):
+            zoneType = br.ReadInt()
+            extraCnt = br.ReadInt()
+            nString = br.ReadInt()
+            wldFileName = br.ReadBytesToString(128, 'latin1')
+            texName1 = br.ReadBytesToString(64, 'latin1')
+            texName2 = br.ReadBytesToString(64, 'latin1')
+            fLoadingStep = br.ReadFloat()
+            fTer_Lodmul = br.ReadFloat()
+
+            zoneInfoChunk.append({
+                "zoneType": zoneType,
+                "extraCnt": extraCnt,
+                "nString": nString,
+                "wldFileName": wldFileName,
+                "texture": {
+                    "texName1": texName1,
+                    "texName2": texName2 
+                },
+                "loadingStep": fLoadingStep,
+                "terLodmul": fTer_Lodmul
+            })
+
+        nExtraCnt = br.ReadInt()
+        zoneExtraChunk = []
+        for i in range(nExtraCnt):
+            zoneExtraChunk.append(br.ReadIntToList(DEF_EXTRA_MAX))
+            
+        data.append({
+            "zoneData": zoneInfoChunk,
+            "zoneExtra": zoneExtraChunk
+        })
+
+    return data
+
+def readChangeItem(file):
+    with open(file, "rb") as f:
+        br = BinaryReader(f)
+        
+        changeWeapon = br.ReadIntToList(br.ReadInt())
+        changeHelmet = br.ReadIntToList(br.ReadInt())
+        changeTop = br.ReadIntToList(br.ReadInt())
+        changePants = br.ReadIntToList(br.ReadInt())
+        changeGloves = br.ReadIntToList(br.ReadInt())
+        changeBoots = br.ReadIntToList(br.ReadInt())
+
+    return {
+            "changeWeapon": changeWeapon,
+            "changeArmor": {
+                "helmet": changeHelmet,
+                "top": changeTop,
+                "pants": changePants,
+                "gloves": changeGloves,
+                "boots": changeBoots
+            }
+    }
+
+def readEvent(file):
+    data = []
+    with open(file, "rb") as f:
+        br = BinaryReader(f)
+        localeId, dataCount = br.ReadInt(), br.ReadInt()
+        
+        for i in range(dataCount):
+            data.append({
+                "eventId": br.ReadInt(),
+                "enable": br.ReadInt()
+            })
+
+    return {
+        "localeId": localeId,
+        "event": data
+    }
+
+def readTitletool(file):
+    data = []
+    with open(file, "rb") as f:
+        br = BinaryReader(f)
+        dataCount = br.ReadInt()
+
+        for i in range(dataCount):            
+            data.append({
+                "id": br.ReadInt(),
+                "enable": br.ByteToInt(br.ReadByte()),
+                "effect": {
+                    "normal": br.ReadBytesToString(64, 'latin1'),
+                    "attack": br.ReadBytesToString(64, 'latin1'),
+                    "damage": br.ReadBytesToString(64, 'latin1')
+                },
+                "color": {
+                    "text": "{:08x}".format(br.ReadInt()),
+                    "background": "{:08x}".format(br.ReadInt()),
+                },
+                "option": {
+                    "id": br.ReadIntToList(5),
+                    "level": [br.ByteToInt(br.ReadByte()), br.ByteToInt(br.ReadByte()), br.ByteToInt(br.ReadByte()), br.ByteToInt(br.ReadByte()), br.ByteToInt(br.ReadByte())]
+                },
+                "itemId": br.ReadInt()
+            })
+
+    return data
+
+def readItem(file, isGamigo):
+    MAX_MAKE_ITEM_MATERIAL = 10
+    DEF_SMC_DEFAULT_LENGTH = 64
+    DEF_MAX_ORIGIN_OPTION = 10
+    DEF_EFFECT_DEFAULT_LENGTH = 32
+
+    data = []
+    with open(file, "rb") as f:
+        br = BinaryReader(f)
+        dataCount = br.ReadInt()
+        print(dataCount)
+        
+        for i in range(dataCount):  
+            data.append({
+                "itemId": br.ReadInt(),
+                "jobFlag": br.ReadInt(),
+                "stack": br.ReadInt(),
+                "fame/maxuse": br.ReadInt(),
+                "level": br.ReadInt(),
+                "flag": br.ReadInt64(),
+                "wearing": br.ReadInt(),
+                "type": br.ReadInt(),
+                "subtype": br.ReadInt(),
+                "crafting": {
+                    "needItemId": br.ReadIntToList(MAX_MAKE_ITEM_MATERIAL),
+                    "needItemCount": br.ReadIntToList(MAX_MAKE_ITEM_MATERIAL)
+                },
+                "specialSkill": {
+                    "needSpecialSkill1": br.ReadIntToList(2),
+                    "needSpecialSkill2": br.ReadIntToList(2),
+                },
+                "iconPosition": br.ReadIntToList(3),
+                "num": br.ReadIntToList(4),
+                "price": br.ReadInt(),
+                "set": br.ReadIntToList(7 if isGamigo else 5),
+                "smc": br.ReadBytesToString(DEF_SMC_DEFAULT_LENGTH, 'latin1'),
+                "effect": {
+                    "normal": br.ReadBytesToString(DEF_EFFECT_DEFAULT_LENGTH, 'latin1'),
+                    "attack": br.ReadBytesToString(DEF_EFFECT_DEFAULT_LENGTH, 'latin1'),
+                    "damage": br.ReadBytesToString(DEF_EFFECT_DEFAULT_LENGTH, 'latin1')
+                },
+                "rareOption": {
+                    "id": br.ReadInt(),
+                    "chance": br.ReadInt(),
+                    "optionIds": br.ReadIntToList(DEF_MAX_ORIGIN_OPTION),
+                    "optionLevels": br.ReadIntToList(DEF_MAX_ORIGIN_OPTION)
+                },
+                "rvr": {
+                    "type": br.ReadInt(),
+                    "grade": br.ReadInt()
+                },
+                "fortuneId": br.ByteToInt(br.ReadByte()),
+                "castleWar": br.ReadInt()
+            })
+            
+    return data
+
+def readMob(file):
+    DEF_SMC_LENGTH = 128
+    DEF_ANI_LENGTH = 64
+
+    data = []
+    with open(file, "rb") as f:
+        br = BinaryReader(f)
+        dataCount = br.ReadInt()
+        print(dataCount)
+        
+        for i in range(dataCount):
+            data.append({
+                "npcId": br.ReadInt(),
+                "level": br.ReadInt(),
+                "health": br.ReadInt(),
+                "mana": br.ReadInt(),
+                "flag": br.ReadInt(),
+                "flag1": br.ReadInt(),
+                "speed": {
+                    "attack": br.ReadInt(),
+                    "walk": br.ReadFloat(),
+                    "run": br.ReadFloat(),
+                },
+                "scale": br.ReadFloat(),
+                "attackArea": br.ReadFloat(),
+                "size": br.ReadFloat(),
+                "master": {
+                    "skill": br.ByteToInt(br.ReadByte()),
+                    "specialSkill": br.ByteToInt(br.ReadByte())
+                },
+                "skillEffect": br.ReadIntToList(5),
+                "attackType": br.ByteToInt(br.ReadByte()),
+                "fire": {
+                    "delayCount": br.ByteToInt(br.ReadByte()),
+                    "delay": br.ReadFloatToList(4),
+                    "object": br.ByteToInt(br.ReadByte()),
+                    "speed": br.ReadFloat()
+                },
+                "skill": {
+                    "skill0": [br.ReadInt(), br.ByteToInt(br.ReadByte())],
+                    "skill1": [br.ReadInt(), br.ByteToInt(br.ReadByte())]
+                },
+                "rvr": {
+                    "grade": br.ReadInt(),
+                    "value": br.ReadInt()
+                },
+                "bound": br.ReadFloat(),
+                "model": {
+                    "smc": br.ReadBytesToString(DEF_SMC_LENGTH, 'latin1'),
+                    "animation": {
+                        "idle": br.ReadBytesToString(DEF_ANI_LENGTH, 'latin1'),
+                        "walk": br.ReadBytesToString(DEF_ANI_LENGTH, 'latin1'),
+                        "damage": br.ReadBytesToString(DEF_ANI_LENGTH, 'latin1'),
+                        "attack": br.ReadBytesToString(DEF_ANI_LENGTH, 'latin1'),
+                        "die": br.ReadBytesToString(DEF_ANI_LENGTH, 'latin1'),
+                        "run": br.ReadBytesToString(DEF_ANI_LENGTH, 'latin1'),
+                        "idle2": br.ReadBytesToString(DEF_ANI_LENGTH, 'latin1'),
+                        "attack2": br.ReadBytesToString(DEF_ANI_LENGTH, 'latin1'),
+                    },
+                },
+                "fireEffect": {
+                    "0": br.ReadBytesToString(DEF_ANI_LENGTH, 'latin1'),
+                    "1": br.ReadBytesToString(DEF_ANI_LENGTH, 'latin1'),
+                    "2": br.ReadBytesToString(DEF_ANI_LENGTH, 'latin1')
+                }
+
+            })
+
+    return data            
+
 def main():
     fileType = input('File [ex: itemAll.lod]: ')
     folder = "C:\\Users\\Administrator\\Desktop\\export"
     file = "{0}\\{1}".format(folder, fileType)
     fileTypeLower = fileType.lower()
+
+    isGamigo = True
 
     if 'actions' in fileTypeLower:
         data = readAction(file)
@@ -567,6 +870,24 @@ def main():
         data = readStatTooltip(file)
     elif 'raidobjectlist' in fileTypeLower:
         data = readRaidObjectList(file)
+    elif 'jewelcompos' in fileTypeLower:
+        data = readJewelCompos(file)
+    elif 'zoneflag' in fileTypeLower:
+        data = readZoneFlag(file)
+    elif 'shop' in fileTypeLower:
+        data = readShop(file)
+    elif 'zone_data' in fileTypeLower:
+        data = readZoneData(file)
+    elif 'change_item' in fileTypeLower:
+        data = readChangeItem(file)
+    elif 'event' in fileTypeLower:
+        data = readEvent(file)
+    elif 'titletool' in fileTypeLower:
+        data = readTitletool(file)
+    elif 'itemall' in fileTypeLower:
+        data = readItem(file, isGamigo)
+    elif 'moball' in fileTypeLower:
+        data = readMob(file)
 
     tpl = {
         "exportInfo": {
@@ -580,6 +901,9 @@ def main():
 
     with open('exported/{0}.json'.format(fileType), 'w', encoding='utf8') as f:
        json.dump(tpl, f, indent=2, ensure_ascii=False)
+
+    #with open('exported/{0}.bson'.format(fileType), 'wb') as bson_file:
+    #    bson_file.write(bson.dumps(tpl))
 
     print("Exported to {0}.json".format(fileType))
             

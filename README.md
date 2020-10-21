@@ -34,8 +34,17 @@
     - moonstone.lod
     - notice.lod
     - raidobjectlist.lod
+    - jewelcompos.lod
+    - zoneflag.lod
+    - shopAll.lod
+    - event_*.lod
+    - titletool.lod
+    - itemAll.lod
+    - mobAll.lod
   - bin/data
     - itemCompose.bin
     - levelup_guide.bin
     - npc_channel.bin
     - statTooltip.bin
+    - zone_data.bin
+    - change_item.bin
