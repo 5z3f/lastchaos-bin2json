@@ -830,82 +830,182 @@ def readMob(file):
 
     return data            
 
+def readAnimation(file):
+    data = []
+    with open(file, "rb") as f:
+        br = BinaryReader(f)
+        header = br.ReadBytesToString(4, 'latin1')
+        version = br.ReadInt()
+
+        animCount = br.ReadInt()
+        for i in range(animCount):
+            skaPath = br.ReadBytesToString(br.ReadInt(), 'latin1')
+            animName = br.ReadBytesToString(br.ReadInt(), 'latin1')
+            fps = br.ReadFloat()
+            numberOfFrames = br.ReadInt()
+            threshold = br.ReadInt()
+            isCompressed = True if br.ReadInt() else False
+            customSpeed = br.ReadInt()
+
+            bones = []
+            boneCount = br.ReadInt()
+            for j in range(boneCount):
+                boneName = br.ReadBytesToString(br.ReadInt(), 'latin1')
+                defaultPosition = br.ReadFloatToList(12)
+
+                positions = []
+                positionCount = br.ReadInt()
+                for k in range(positionCount):
+                    positions.append({
+                        "frame": br.ReadInt16(),
+                        "flags": br.ReadInt16(),
+                        "position": {
+                            "x": br.ReadFloat(),
+                            "y": br.ReadFloat(),
+                            "z": br.ReadFloat()
+                        }       
+                    })
+
+                rotations = []
+                rotationCount = br.ReadInt()
+                for k in range(rotationCount):
+                    rotations.append({
+                        "frame": br.ReadInt16(),
+                        "flags": br.ReadInt16(),
+                        "position": {
+                            "w": br.ReadFloat(),
+                            "x": br.ReadFloat(),
+                            "y": br.ReadFloat(),
+                            "z": br.ReadFloat()
+                        }       
+                    })
+            
+                offsetLen = br.ReadFloat()
+                
+                bones.append({
+                    "boneName": boneName,
+                    "defaultPosition": defaultPosition, # matrix12
+                    "positions": positions,
+                    "rotations": rotations,
+                    "offsetLen": offsetLen
+                })
+
+
+            data.append({
+                "skaPath": skaPath,
+                "name": animName,
+                "fps": fps,
+                "frameCount": numberOfFrames,
+                "threshold": threshold,
+                "isCompressed": isCompressed,
+                "customSpeed": customSpeed,
+                "bones": bones,
+                "morphCount": br.ReadInt()
+            })
+
+    return {
+        "header": header,
+        "version": version,
+        "animations": data
+    }
+
+def readVersion(file):
+    with open(file, "rb") as f:
+        br = BinaryReader(f)
+        encVersion = br.ReadInt()
+
+    return {
+        "version": int((encVersion - 27) / 3)
+    }
+
 def main():
-    fileType = input('File [ex: itemAll.lod]: ')
-    folder = "C:\\Users\\Administrator\\Desktop\\export"
-    file = "{0}\\{1}".format(folder, fileType)
-    fileTypeLower = fileType.lower()
+    file = input('File [ex: itemAll.lod]: ')
+    fileLoc = "C:\\Users\\Administrator\\Desktop\\export\\" + file
+    fileLower = file.lower()
 
     isGamigo = True
 
-    if 'actions' in fileTypeLower:
-        data = readAction(file)
-    elif 'affinity' in fileTypeLower:
-        data = readAffinity(file)
-    elif 'bigpet' in fileTypeLower:
-        data = readBigpet(file)
-    elif 'combo' in fileTypeLower:
-        data = readCombo(file)
-    elif 'option' in fileTypeLower:
-        data = readOption(file)
-    elif 'quest' in fileTypeLower:
-        data = readQuest(file)
-    elif 'smc' in fileTypeLower:
-        data = readSMC(file)
-    elif 'itemcompose' in fileTypeLower:
-        data = readItemCompose(file)
-    elif 'levelup_guide' in fileTypeLower:
-        data = readLevelupGuide(file)
-    elif 'npc_channel' in fileTypeLower:
-        data = readNpcChannel(file)
-    elif 'item_exchange' in fileTypeLower:
-        data = readItemExchange(file)
-    elif 'itemfortune' in fileTypeLower:
-        data = readItemFortune(file)
-    elif 'moonstone' in fileTypeLower:
-        data = readMoonstone(file)
-    elif 'notice' in fileTypeLower:
-        data = readNotice(file)
-    elif 'stattooltip' in fileTypeLower:
-        data = readStatTooltip(file)
-    elif 'raidobjectlist' in fileTypeLower:
-        data = readRaidObjectList(file)
-    elif 'jewelcompos' in fileTypeLower:
-        data = readJewelCompos(file)
-    elif 'zoneflag' in fileTypeLower:
-        data = readZoneFlag(file)
-    elif 'shop' in fileTypeLower:
-        data = readShop(file)
-    elif 'zone_data' in fileTypeLower:
-        data = readZoneData(file)
-    elif 'change_item' in fileTypeLower:
-        data = readChangeItem(file)
-    elif 'event' in fileTypeLower:
-        data = readEvent(file)
-    elif 'titletool' in fileTypeLower:
-        data = readTitletool(file)
-    elif 'itemall' in fileTypeLower:
-        data = readItem(file, isGamigo)
-    elif 'moball' in fileTypeLower:
-        data = readMob(file)
+    if 'actions' in fileLower:
+        data = readAction(fileLoc)
+    elif 'affinity' in fileLower:
+        data = readAffinity(fileLoc)
+    elif 'bigpet' in fileLower:
+        data = readBigpet(fileLoc)
+    elif 'combo' in fileLower:
+        data = readCombo(fileLoc)
+    elif 'option' in fileLower:
+        data = readOption(fileLoc)
+    elif 'quest' in fileLower:
+        data = readQuest(fileLoc)
+    elif 'smc' in fileLower:
+        data = readSMC(fileLoc)
+    elif 'itemcompose' in fileLower:
+        data = readItemCompose(fileLoc)
+    elif 'levelup_guide' in fileLower:
+        data = readLevelupGuide(fileLoc)
+    elif 'npc_channel' in fileLower:
+        data = readNpcChannel(fileLoc)
+    elif 'item_exchange' in fileLower:
+        data = readItemExchange(fileLoc)
+    elif 'itemfortune' in fileLower:
+        data = readItemFortune(fileLoc)
+    elif 'moonstone' in fileLower:
+        data = readMoonstone(fileLoc)
+    elif 'notice' in fileLower:
+        data = readNotice(fileLoc)
+    elif 'stattooltip' in fileLower:
+        data = readStatTooltip(fileLoc)
+    elif 'raidobjectlist' in fileLower:
+        data = readRaidObjectList(fileLoc)
+    elif 'jewelcompos' in fileLower:
+        data = readJewelCompos(fileLoc)
+    elif 'zoneflag' in fileLower:
+        data = readZoneFlag(fileLoc)
+    elif 'shop' in fileLower:
+        data = readShop(fileLoc)
+    elif 'zone_data' in fileLower:
+        data = readZoneData(fileLoc)
+    elif 'change_item' in fileLower:
+        data = readChangeItem(fileLoc)
+    elif 'event' in fileLower:
+        data = readEvent(fileLoc)
+    elif 'titletool' in fileLower:
+        data = readTitletool(fileLoc)
+    elif 'itemall' in fileLower:
+        data = readItem(fileLoc, isGamigo)
+    elif 'moball' in fileLower:
+        data = readMob(fileLoc)
+    elif file.split('.')[1] == 'ba':
+        data = readAnimation(fileLoc)
+    elif fileLower == 'vtm.brn':
+        data = readVersion(fileLoc)
+
+    fileType = { 
+        "ba": 'ba/animation',
+        "lod": 'lod/data',
+        "bin": 'bin/data',
+        'dta': 'dta/data',
+        'brn': 'brn/version'
+    }
+
 
     tpl = {
         "exportInfo": {
             "gameVersion": None,
-            "file": fileType,
-            "fileType": 'bin/data' if '.bin' in fileType else "lod/data",
+            "file": file,
+            "fileType": fileType[file.split('.')[1]],
             "timestamp": calendar.timegm(time.gmtime())
         },
         "data": data
     }
 
-    with open('exported/{0}.json'.format(fileType), 'w', encoding='utf8') as f:
+    with open('exported/{0}.json'.format(file), 'w', encoding='utf8') as f:
        json.dump(tpl, f, indent=2, ensure_ascii=False)
 
     #with open('exported/{0}.bson'.format(fileType), 'wb') as bson_file:
     #    bson_file.write(bson.dumps(tpl))
 
-    print("Exported to {0}.json".format(fileType))
+    print("Exported to {0}.json".format(file))
             
 if __name__ == '__main__':
     main()

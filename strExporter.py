@@ -40,7 +40,7 @@ def readStr(file, fileType, encoding, isGamigo):
 
             if 'stritem' in fileTypeLower and isGamigo:
                 unknown0 = br.ReadInt()
-                unknown1 = br.ReadBytesToString(unknown0, 'latin1') if unknown0 else None
+                unknown1 = br.ReadBytesToString(unknown0, 'latin1') if unknown0 else 'False'
             
             chunk = {   
                 "id": id,

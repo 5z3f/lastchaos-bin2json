@@ -48,3 +48,5 @@
     - statTooltip.bin
     - zone_data.bin
     - change_item.bin
+  - ba/animation
+    - ni.ba (example)
