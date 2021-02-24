@@ -1,6 +1,3 @@
-# lastchaos-tools
-lastchaos file exporter/viewer
-
 # Currently Available
 
 * File Exporters
