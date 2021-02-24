@@ -1,6 +1,6 @@
 # lastchaos-tools
- Various game development tools for LastChaos MMORPG
- 
+lastchaos file exporter/viewer
+
 # Currently Available
 
 * File Exporters
