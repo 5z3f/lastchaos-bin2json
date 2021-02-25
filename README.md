@@ -1,6 +1,3 @@
-# lastchaos-tools
- Various game development tools for LastChaos MMORPG
- 
 # Currently Available
 
 * File Exporters
@@ -50,3 +47,5 @@
     - change_item.bin
   - ba/animation
     - ni.ba (example)
+  - brn/version
+    - vtm.brn

@@ -26,6 +26,12 @@ class BinaryReader:
     def ReadFloat(self):
         return (floor(unpack('@f', self.f.read(4))[0]*pow(10, 3)+0.5))/pow(10, 3)
 
+    def ReadFloat8(self):
+        return round(unpack('@f', self.f.read(4))[0], 8)#(floor(unpack('@f', self.f.read(4))[0]*pow(10, 8)+0.5))/pow(10, 8)
+
+    def ReadPreciseFloat(self):
+        return round(unpack('@f', self.f.read(4))[0], 8)
+
     def ReadFloatToList(self, i):
         return list(unpack('@%df' % i, self.f.read(4*i)))
 

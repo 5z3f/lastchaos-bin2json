@@ -11,7 +11,7 @@ def readStr(file, fileType, encoding, isGamigo):
     data = []
     with open(file, "rb") as f:
         br = BinaryReader(f)
-        dataCount, dataMax = br.ReadInt(), br.ReadInt()
+        dataCount, dataMax = br.ReadInt() - 1, br.ReadInt()
         fileTypeLower = fileType.lower()
 
         descCount = 1
@@ -40,7 +40,7 @@ def readStr(file, fileType, encoding, isGamigo):
 
             if 'stritem' in fileTypeLower and isGamigo:
                 unknown0 = br.ReadInt()
-                unknown1 = br.ReadBytesToString(unknown0, 'latin1') if unknown0 else 'False'
+                unknown1 = br.ReadBytesToString(unknown0, encoding) if unknown0 else 'False'
             
             chunk = {   
                 "id": id,
@@ -61,7 +61,7 @@ def main():
 
     isGamigo = True
 
-    data = readStr(file, fileType, 'latin1', isGamigo)
+    data = readStr(file, fileType, encoding = 'latin1', isGamigo = isGamigo)
             
     tpl = {
         "exportInfo": {

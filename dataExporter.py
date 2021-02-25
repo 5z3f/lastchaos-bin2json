@@ -436,26 +436,17 @@ def readNotice(file):
         dataCount = br.ReadInt()
         
         for i in range(dataCount):
-            id = br.ReadInt()
-            enabled = br.ReadInt()
-            title = br.ReadString('latin1')
-            message = br.ReadString('latin1')
-            startTime = br.ReadString('latin1')
-            endTime = br.ReadString('latin1')
-            cycle = br.ReadInt()
-            color = [br.ByteToInt(br.ReadByte()), br.ByteToInt(br.ReadByte()), br.ByteToInt(br.ReadByte()), br.ByteToInt(br.ReadByte())]
-
             data.append({
-                "id": id,
-                "enabled": enabled,
-                "title": title,
-                "message": message,
+                "id": br.ReadInt(),
+                "enabled": br.ReadInt(),
+                "title": br.ReadString('latin1'),
+                "message": br.ReadString('latin1'),
                 "time": {
-                    "start": startTime,
-                    "end": endTime
+                    "start": br.ReadString('latin1'),
+                    "end": br.ReadString('latin1')
                 },
-                "cycle": cycle,
-                "color": color
+                "cycle": br.ReadInt(),
+                "color": [br.ByteToInt(br.ReadByte()), br.ByteToInt(br.ReadByte()), br.ByteToInt(br.ReadByte()), br.ByteToInt(br.ReadByte())]
             })
             
     return data
@@ -476,19 +467,13 @@ def readRaidObjectList(file):
         dataCount = br.ReadInt()
 
         for i in range(dataCount):
-            id = br.ReadInt()
-            assignZone = br.ReadInt()
-            objectType = br.ReadInt()
-            objectIndex = br.ReadInt()
-            objectName = br.ReadString('latin1')
-
             data.append({
-                "id": id,
-                "assignZone": assignZone,
+                "id": br.ReadInt(),
+                "assignZone": br.ReadInt(),
                 "object": {
-                    "id": objectIndex,
-                    "type": objectType,
-                    "name": objectName,
+                    "id": br.ReadInt(),
+                    "type": br.ReadInt(),
+                    "name": br.ReadString('latin1'),
                 }
             })
             
@@ -768,7 +753,6 @@ def readMob(file):
     with open(file, "rb") as f:
         br = BinaryReader(f)
         dataCount = br.ReadInt()
-        print(dataCount)
         
         for i in range(dataCount):
             data.append({
@@ -834,7 +818,7 @@ def readAnimation(file):
     data = []
     with open(file, "rb") as f:
         br = BinaryReader(f)
-        header = br.ReadBytesToString(4, 'latin1')
+        magic = br.ReadBytesToString(4, 'latin1')
         version = br.ReadInt()
 
         animCount = br.ReadInt()
@@ -904,7 +888,7 @@ def readAnimation(file):
             })
 
     return {
-        "header": header,
+        "magic": magic,
         "version": version,
         "animations": data
     }
