@@ -1,4 +1,3 @@
-# Usage
 ```bash
 py dataExporter.py --help                                                                                
 usage: dataExporter.py [-h] -f INFILE [-g]
