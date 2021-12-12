@@ -1,5 +1,3 @@
-# Currently Available
-
 # Usage
 ```bash
 py dataExporter.py --help                                                                                
@@ -20,6 +18,8 @@ options:
   -f INFILE, --file INFILE
   -g, --gamigo
 ```
+
+# Currently Available
 
 * File Exporters
   - lod/string
