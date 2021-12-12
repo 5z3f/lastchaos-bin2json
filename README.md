@@ -1,5 +1,26 @@
 # Currently Available
 
+# Usage
+```bash
+py dataExporter.py --help                                                                                
+usage: dataExporter.py [-h] -f INFILE [-g]
+
+options:
+  -h, --help            show this help message and exit
+  -f INFILE, --file INFILE
+  -g, --gamigo
+```
+
+```bash
+py strExporter.py --help 
+usage: strExporter.py [-h] -f INFILE [-g]
+
+options:
+  -h, --help            show this help message and exit
+  -f INFILE, --file INFILE
+  -g, --gamigo
+```
+
 * File Exporters
   - lod/string
     - strAction

@@ -6,7 +6,8 @@ from lib.reader import BinaryReader
 import calendar
 import time
 import json
-import bson
+import os
+import argparse
 
 def readAction(file):
     data = []
@@ -325,7 +326,7 @@ def readSMC(file):
         for i in range(dataCount):
             id = br.ReadInt()
 
-            if id is not 0:
+            if id != 0:
                 meshClass = br.ReadBytesToString(br.ReadInt16(), 'latin1') 
                 meshSize = br.ReadInt()
 
@@ -456,9 +457,7 @@ def readStatTooltip(file):
         br = BinaryReader(f)
         dataCount = br.ReadInt()
 
-        return {
-            "statTooltipData": br.ReadIntToList(dataCount),
-        }
+        return br.ReadIntToList(dataCount)
 
 def readRaidObjectList(file):
     data = []
@@ -573,7 +572,7 @@ def readShop(file):
             })
 
             if dataCount == id:
-                break;
+                break
                 
     return data
 
@@ -698,7 +697,6 @@ def readItem(file, isGamigo):
     with open(file, "rb") as f:
         br = BinaryReader(f)
         dataCount = br.ReadInt()
-        print(dataCount)
         
         for i in range(dataCount):  
             data.append({
@@ -903,66 +901,74 @@ def readVersion(file):
     }
 
 def main():
-    file = input('File [ex: itemAll.lod]: ')
-    fileLoc = "C:\\Users\\Administrator\\Desktop\\export\\" + file
-    fileLower = file.lower()
+    parser = argparse.ArgumentParser()
+    parser.add_argument('-f', '--file', dest='infile', required=True)
+    parser.add_argument('-g', '--gamigo', dest='gamigo', action='store_true')
+    args = parser.parse_args()
 
-    isGamigo = True
+    isGamigo = args.gamigo
 
-    if 'actions' in fileLower:
-        data = readAction(fileLoc)
-    elif 'affinity' in fileLower:
-        data = readAffinity(fileLoc)
-    elif 'bigpet' in fileLower:
-        data = readBigpet(fileLoc)
-    elif 'combo' in fileLower:
-        data = readCombo(fileLoc)
-    elif 'option' in fileLower:
-        data = readOption(fileLoc)
-    elif 'quest' in fileLower:
-        data = readQuest(fileLoc)
-    elif 'smc' in fileLower:
-        data = readSMC(fileLoc)
-    elif 'itemcompose' in fileLower:
-        data = readItemCompose(fileLoc)
-    elif 'levelup_guide' in fileLower:
-        data = readLevelupGuide(fileLoc)
-    elif 'npc_channel' in fileLower:
-        data = readNpcChannel(fileLoc)
-    elif 'item_exchange' in fileLower:
-        data = readItemExchange(fileLoc)
-    elif 'itemfortune' in fileLower:
-        data = readItemFortune(fileLoc)
-    elif 'moonstone' in fileLower:
-        data = readMoonstone(fileLoc)
-    elif 'notice' in fileLower:
-        data = readNotice(fileLoc)
-    elif 'stattooltip' in fileLower:
-        data = readStatTooltip(fileLoc)
-    elif 'raidobjectlist' in fileLower:
-        data = readRaidObjectList(fileLoc)
-    elif 'jewelcompos' in fileLower:
-        data = readJewelCompos(fileLoc)
-    elif 'zoneflag' in fileLower:
-        data = readZoneFlag(fileLoc)
-    elif 'shop' in fileLower:
-        data = readShop(fileLoc)
-    elif 'zone_data' in fileLower:
-        data = readZoneData(fileLoc)
-    elif 'change_item' in fileLower:
-        data = readChangeItem(fileLoc)
-    elif 'event' in fileLower:
-        data = readEvent(fileLoc)
-    elif 'titletool' in fileLower:
-        data = readTitletool(fileLoc)
-    elif 'itemall' in fileLower:
-        data = readItem(fileLoc, isGamigo)
-    elif 'moball' in fileLower:
-        data = readMob(fileLoc)
-    elif file.split('.')[1] == 'ba':
-        data = readAnimation(fileLoc)
-    elif fileLower == 'vtm.brn':
-        data = readVersion(fileLoc)
+    fileName = os.path.basename(args.infile)
+    fileNameLower = fileName.lower()
+    fileDir = os.path.dirname(args.infile)
+
+    if 'actions' in fileNameLower:
+        data = readAction(args.infile)
+    elif 'affinity' in fileNameLower:
+        data = readAffinity(args.infile)
+    elif 'bigpet' in fileNameLower:
+        data = readBigpet(args.infile)
+    elif 'combo' in fileNameLower:
+        data = readCombo(args.infile)
+    elif 'option' in fileNameLower:
+        data = readOption(args.infile)
+    elif 'quest' in fileNameLower:
+        data = readQuest(args.infile)
+    elif 'smc' in fileNameLower:
+        data = readSMC(args.infile)
+    elif 'itemcompose' in fileNameLower:
+        data = readItemCompose(args.infile)
+    elif 'levelup_guide' in fileNameLower:
+        data = readLevelupGuide(args.infile)
+    elif 'npc_channel' in fileNameLower:
+        data = readNpcChannel(args.infile)
+    elif 'item_exchange' in fileNameLower:
+        data = readItemExchange(args.infile)
+    elif 'itemfortune' in fileNameLower:
+        data = readItemFortune(args.infile)
+    elif 'moonstone' in fileNameLower:
+        data = readMoonstone(args.infile)
+    elif 'notice' in fileNameLower:
+        data = readNotice(args.infile)
+    elif 'stattooltip' in fileNameLower:
+        data = readStatTooltip(args.infile)
+    elif 'raidobjectlist' in fileNameLower:
+        data = readRaidObjectList(args.infile)
+    elif 'jewelcompos' in fileNameLower:
+        data = readJewelCompos(args.infile)
+    elif 'zoneflag' in fileNameLower:
+        data = readZoneFlag(args.infile)
+    elif 'shop' in fileNameLower:
+        data = readShop(args.infile)
+    elif 'zone_data' in fileNameLower:
+        data = readZoneData(args.infile)
+    elif 'change_item' in fileNameLower:
+        data = readChangeItem(args.infile)
+    elif 'event' in fileNameLower:
+        data = readEvent(args.infile)
+    elif 'titletool' in fileNameLower:
+        data = readTitletool(args.infile)
+    elif 'itemall' in fileNameLower:
+        data = readItem(args.infile, isGamigo)
+    elif 'moball' in fileNameLower:
+        data = readMob(args.infile)
+    elif fileName.split('.')[1] == 'ba':
+        data = readAnimation(args.infile)
+    elif fileNameLower == 'vtm.brn':
+        data = readVersion(args.infile)
+    else:
+        print(f"{fileName} is not supported yet")
+        exit()
 
     fileType = { 
         "ba": 'ba/animation',
@@ -972,24 +978,20 @@ def main():
         'brn': 'brn/version'
     }
 
-
     tpl = {
         "exportInfo": {
             "gameVersion": None,
-            "file": file,
-            "fileType": fileType[file.split('.')[1]],
+            "file": fileName,
+            "fileType": fileType[fileName.split('.')[1]],
             "timestamp": calendar.timegm(time.gmtime())
         },
         "data": data
     }
 
-    with open('exported/{0}.json'.format(file), 'w', encoding='utf8') as f:
+    with open(f"{fileDir}\{fileName}.json", 'w', encoding='utf8') as f:
        json.dump(tpl, f, indent=2, ensure_ascii=False)
 
-    #with open('exported/{0}.bson'.format(fileType), 'wb') as bson_file:
-    #    bson_file.write(bson.dumps(tpl))
-
-    print("Exported to {0}.json".format(file))
+    print(f"Exported to: {fileDir}\{fileName}.json")
             
 if __name__ == '__main__':
     main()

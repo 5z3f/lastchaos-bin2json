@@ -7,6 +7,16 @@ class BinaryReader:
     def __init__(self, file):
         self.f = file
 
+        self.f.seek(0, 2)
+        self.fileBytes = self.f.tell()
+        self.f.seek(0, 0)
+
+    def pos(self):
+        return self.f.tell()
+        
+    def size(self):
+        return self.fileBytes
+    
     def ReadInt(self):
         i = unpack('@I', self.f.read(4))[0]
         return -1 if i == 4294967295 else i

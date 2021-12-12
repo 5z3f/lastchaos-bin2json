@@ -6,6 +6,8 @@ from lib.reader import BinaryReader
 import calendar
 import time
 import json
+import argparse
+import os
 
 def readStr(file, fileType, encoding, isGamigo):
     data = []
@@ -31,6 +33,10 @@ def readStr(file, fileType, encoding, isGamigo):
 
         
         for i in range(dataCount):
+
+            if br.pos() >= br.size():
+                break
+                
             id = br.ReadInt()
             name = br.ReadString(encoding)
 
@@ -55,28 +61,32 @@ def readStr(file, fileType, encoding, isGamigo):
     return data
 
 def main():
-    fileType = input('string file [ex. strItem_us.lod]: ')
-    folder = "C:\\Program Files (x86)\\gamigo AG\\LastChaosUK_VIP\\Local\\uk\\String"
-    file = "{0}\\{1}".format(folder, fileType)
+    parser = argparse.ArgumentParser()
+    parser.add_argument('-f', '--file', dest='infile', required=True)
+    parser.add_argument('-g', '--gamigo', dest='gamigo', action='store_true')
 
-    isGamigo = True
+    args = parser.parse_args()
 
-    data = readStr(file, fileType, encoding = 'latin1', isGamigo = isGamigo)
+    fileNameBase = os.path.basename(args.infile)
+    fileName = fileNameBase.split('_')[0]
+    fileDir = os.path.dirname(args.infile)
+
+    data = readStr(args.infile, fileName, encoding = 'latin1', isGamigo = args.gamigo)
             
     tpl = {
         "exportInfo": {
             "gameVersion": None,
-            "file": fileType,
+            "file": fileNameBase,
             "fileType": "lod/string",
             "timestamp": calendar.timegm(time.gmtime())
         },
         "data": data
     }
 
-    with open('exported/{0}.json'.format(fileType), 'w', encoding='utf8') as f:
+    with open(f"{fileDir}\{fileNameBase}.json", 'w', encoding='utf8') as f:
         json.dump(tpl, f, indent=2, ensure_ascii=False)
 
-    print("Exported to %s.json" % fileType)
+    print(f"Exported to: {fileDir}\{fileNameBase}.json")
             
 if __name__ == '__main__':
     main()
