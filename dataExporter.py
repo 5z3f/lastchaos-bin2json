@@ -900,6 +900,25 @@ def readVersion(file):
         "version": int((encVersion - 27) / 3)
     }
 
+def readPersistentSymbols(file):
+    with open(file, "rb") as f:
+        br = BinaryReader(f)
+        length = br.ReadInt()
+        data = f.read()
+
+    seed = ";!k.az\"MAEjhgasbube18340-fZ,;asAOJM.joqwAsefFsFjd"
+    seedLen = len(seed)
+    buffer = ''
+	
+    for i in range(0, length):
+        shift = 8 - ((length - i) % 8 + 1)
+        val = data[i] ^ ord(seed[(length + 23*i) % seedLen])
+        val = (val << 16) << shift
+        val = (val & 0x00FF0000) | ((val & 0xFF000000) >> 8)
+        buffer += chr(val >> 16)
+
+    return buffer
+
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument('-f', '--file', dest='infile', required=True)
@@ -966,6 +985,14 @@ def main():
         data = readAnimation(args.infile)
     elif fileNameLower == 'vtm.brn':
         data = readVersion(args.infile)
+    elif fileNameLower == 'ps.dat':
+        data = readPersistentSymbols(args.infile)
+
+        with open(f"{fileDir}\ps.dat.txt", 'w', encoding='utf8') as f:
+            f.write(data)
+
+        print(f"Exported to: {fileDir}\ps.dat.txt")
+        return
     else:
         print(f"{fileName} is not supported yet")
         exit()

@@ -69,3 +69,5 @@ options:
     - ni.ba (example)
   - brn/version
     - vtm.brn
+  - dat/persistent symbols
+    - ps.dat
