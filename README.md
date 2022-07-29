@@ -16,6 +16,7 @@ options:
   -h, --help            show this help message and exit
   -f INFILE, --file INFILE
   -g, --gamigo
+  -s, --simple          Export results as very simple array format
 ```
 
 # Currently Available

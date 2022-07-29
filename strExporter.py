@@ -9,7 +9,7 @@ import json
 import argparse
 import os
 
-def readStr(file, fileType, encoding, isGamigo):
+def readStr(file, fileType, encoding, gamigo, simple):
     data = []
     with open(file, "rb") as f:
         br = BinaryReader(f)
@@ -27,11 +27,10 @@ def readStr(file, fileType, encoding, isGamigo):
             'stroption'
         ]
 
-        if 'strskill' in fileTypeLower:            descCount = 2
-        elif 'strquest' in fileTypeLower:          descCount = 3
-        elif fileTypeLower[:-7] in emptyDescFiles: descCount = 0
+        if 'strskill' in fileTypeLower:         descCount = 2
+        elif 'strquest' in fileTypeLower:       descCount = 3
+        elif fileTypeLower in emptyDescFiles:   descCount = 0
 
-        
         for i in range(dataCount):
 
             if br.pos() >= br.size():
@@ -39,22 +38,30 @@ def readStr(file, fileType, encoding, isGamigo):
                 
             id = br.ReadInt()
             name = br.ReadString(encoding)
-
+            
             desc = []
             for j in range(descCount):
                 desc.append(br.ReadString(encoding))
 
-            if 'stritem' in fileTypeLower and isGamigo:
+            if 'stritem' in fileTypeLower and gamigo:
                 unknown0 = br.ReadInt()
                 unknown1 = br.ReadBytesToString(unknown0, encoding) if unknown0 else 'False'
             
-            chunk = {   
-                "id": id,
-                "name": name
-            }
+            if not simple:
+                chunk = {   
+                    "id": id,
+                    "name": name
+                }
+                
+                if descCount:
+                    chunk["description"] = desc
+            else:
+                chunk = []
+                chunk.append(id)
+                chunk.append(name)
 
-            if descCount:
-                chunk["description"] = desc
+                if descCount:
+                    chunk.append(desc)
 
             data.append(chunk)
 
@@ -64,6 +71,7 @@ def main():
     parser = argparse.ArgumentParser()
     parser.add_argument('-f', '--file', dest='infile', required=True)
     parser.add_argument('-g', '--gamigo', dest='gamigo', action='store_true')
+    parser.add_argument('-s', '--simple', dest='simple', action='store_true', help="Export results as very simple array format")
 
     args = parser.parse_args()
 
@@ -71,7 +79,7 @@ def main():
     fileName = fileNameBase.split('_')[0]
     fileDir = os.path.dirname(args.infile)
 
-    data = readStr(args.infile, fileName, encoding = 'latin1', isGamigo = args.gamigo)
+    data = readStr(args.infile, fileName, encoding = 'latin1', gamigo = args.gamigo, simple = args.simple)
             
     tpl = {
         "exportInfo": {
@@ -84,7 +92,7 @@ def main():
     }
 
     with open(f"{fileDir}\{fileNameBase}.json", 'w', encoding='utf8') as f:
-        json.dump(tpl, f, indent=2, ensure_ascii=False)
+        json.dump(tpl if not args.simple else data, f, indent=2, ensure_ascii=False)
 
     print(f"Exported to: {fileDir}\{fileNameBase}.json")
             
